@@ -14,7 +14,10 @@ class PostSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Post
-        fields = ['id', 'title', 'content', 'created_at', 'updated_at', 'tags', 'tag_names']
+        fields = [
+            'id', 'title', 'content', 'created_at', 'updated_at', 
+            'view_count', 'like_count', 'tags', 'tag_names'
+        ]
 
     def create(self, validated_data):
         tag_names = validated_data.pop('tag_names', [])
@@ -41,7 +44,7 @@ class PostCreateUpdateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Post
-        fields = ['title', 'content', 'tag_names']
+        fields = ['title', 'content', 'view_count', 'like_count', 'tag_names']
 
     def create(self, validated_data):
         tag_names = validated_data.pop('tag_names', [])
@@ -55,6 +58,8 @@ class PostCreateUpdateSerializer(serializers.ModelSerializer):
         tag_names = validated_data.pop('tag_names', [])
         instance.title = validated_data.get('title', instance.title)
         instance.content = validated_data.get('content', instance.content)
+        instance.view_count = validated_data.get('view_count', instance.view_count)
+        instance.like_count = validated_data.get('like_count', instance.like_count)
         instance.save()
 
         # Clear existing tags and add new ones
