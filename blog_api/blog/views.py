@@ -7,7 +7,6 @@ from rest_framework.decorators import api_view, permission_classes
 from .models import Post, Tag
 from .serializers import PostSerializer, PostCreateUpdateSerializer, TagSerializer
 import logging
-import json
 
 logger = logging.getLogger(__name__)
 
@@ -49,6 +48,16 @@ class PostDetail(generics.RetrieveUpdateDestroyAPIView):
             return PostCreateUpdateSerializer
         return PostSerializer
 
+    def retrieve(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            instance.increment_view_count()
+            serializer = self.get_serializer(instance)
+            return Response(serializer.data)
+        except Exception as e:
+            logger.error(f"Error retrieving or incrementing view count for post detail: {e}", exc_info=True)
+            return Response({'status': 'error', 'message': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 class TagList(generics.ListAPIView):
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
@@ -71,12 +80,14 @@ def update_like_count(request, pk):
 @permission_classes([AllowAny])
 def increment_view_count(request, pk):
     try:
+        logger.info(f"Attempting to increment view count for post id {pk}")
         post = Post.objects.get(pk=pk)
-        post.view_count += 1
-        post.save()
+        post.increment_view_count()
+        logger.info(f"View count incremented successfully for post id {pk}")
         return Response({'status': 'success', 'view_count': post.view_count}, status=status.HTTP_200_OK)
     except Post.DoesNotExist:
+        logger.error(f"Post with id {pk} not found")
         return Response({'status': 'error', 'message': 'Post not found'}, status=status.HTTP_404_NOT_FOUND)
     except Exception as e:
-        logger.error(f"Error updating view count: {e}")
+        logger.error(f"Error updating view count: {e}", exc_info=True)
         return Response({'status': 'error', 'message': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
