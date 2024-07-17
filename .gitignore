@@ -1,2 +1,5 @@
 venv/
 blog_api/.env
+
+__pycache__/
+*.pyc
