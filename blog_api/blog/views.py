@@ -43,7 +43,7 @@ class PostDetail(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [IsAuthenticatedOrReadOnly]
 
     def get_serializer_class(self):
-        if self.request.method in ['PUT', 'PATCH']:
+        if self.request.method in ['PUT', 'PATCH', 'DELETE']:
             self.authentication_classes = [JWTAuthentication]
             return PostCreateUpdateSerializer
         return PostSerializer
