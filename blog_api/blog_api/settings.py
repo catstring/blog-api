@@ -125,10 +125,10 @@ WSGI_APPLICATION = 'blog_api.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'djongo',
-        'NAME': 'new_blog',
+        'ENGINE': env('DB_ENGINE'),
+        'NAME': env('DB_NAME'),
         'CLIENT': {
-            'host': 'mongodb+srv://toddmctsai:Fo1zwAgUqPvCmPbY@cluster0.ohtvgui.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0',
+            'host': env('DB_HOST'),
             'ssl_ca_certs': certifi.where()
         }
     }
